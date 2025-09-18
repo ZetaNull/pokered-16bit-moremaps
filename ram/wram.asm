@@ -1794,7 +1794,7 @@ wYBlockCoord:: db
 wXBlockCoord:: db
 
 wLastMap:: db
-wUnusedLastMapWidth:: db
+wCurMapset:: db
 
 wCurMapHeader::
 wCurMapTileset:: db

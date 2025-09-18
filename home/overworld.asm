@@ -460,6 +460,18 @@ CheckWarpsCollision::
 	jr nz, .retry2
 	ld a, [hli]
 	ld [wDestinationWarpID], a
+	; Begin Zetacode
+	ld a, 0						; Set a to 0
+	ld [wCurMapset], a			; Set mapset to 0
+	ld a, [wDestinationWarpID]	; pull warp ID back into a to check bit 6
+	bit 6, a
+	jr z, .cont1
+	and a, $bf ; clear second highest bit, add 64 to warp IDs for this to do anything
+	ld [wDestinationWarpID], a
+	ld a, 1
+	ld [wCurMapset], a
+.cont1
+	; End Zetacode
 	ld a, [hl]
 	ldh [hWarpDestinationMap], a
 	jr WarpFound2
@@ -482,6 +494,18 @@ CheckWarpsNoCollisionRetry2::
 WarpFound1::
 	ld a, [hli]
 	ld [wDestinationWarpID], a
+	; Begin Zetacode
+	ld a, 0						; Set a to 0
+	ld [wCurMapset], a			; Set mapset to 0
+	ld a, [wDestinationWarpID]	; pull warp ID back into a to check bit 6
+	bit 6, a
+	jr z, .cont1
+	and a, $bf ; clear second highest bit, add 64 to warp IDs for this to do anything
+	ld [wDestinationWarpID], a
+	ld a, 1
+	ld [wCurMapset], a
+.cont1
+	; End Zetacode
 	ld a, [hli]
 	ldh [hWarpDestinationMap], a
 
@@ -497,7 +521,7 @@ WarpFound2::
 	ld a, [wCurMap]
 	ld [wLastMap], a
 	ld a, [wCurMapWidth]
-	ld [wUnusedLastMapWidth], a
+;	ld [wUnusedLastMapWidth], a
 	ldh a, [hWarpDestinationMap]
 	ld [wCurMap], a
 	cp ROCK_TUNNEL_1F

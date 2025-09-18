@@ -145,6 +145,9 @@ SetPal_Overworld:
 	ld de, wPalPacket
 	ld bc, $10
 	call CopyData
+	ld a, [wCurMapset]
+	cp a, 0
+	jr nz, .caveOrBruno
 	ld a, [wCurMapTileset]
 	cp CEMETERY
 	jr z, .PokemonTowerOrAgatha
