@@ -1,0 +1,17 @@
+CreditsMons:
+; one entry per CRED_TEXT_MON or CRED_TEXT_FADE_MON in CreditsOrder
+	dw VENUSAUR
+	dw ARBOK
+	dw RHYHORN
+	dw FEAROW
+	dw ABRA
+	dw GRAVELER
+	dw HITMONLEE
+	dw TANGELA
+	dw STARMIE
+	dw GYARADOS
+	dw DITTO
+	dw OMASTAR
+	dw VILEPLUME
+	dw NIDOKING
+	dw PARASECT

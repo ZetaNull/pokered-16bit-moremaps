@@ -1,0 +1,495 @@
+DrawHPBar::
+; Draw an HP bar d tiles long, and fill it to e pixels.
+; If c is nonzero, show at least a sliver regardless.
+; The right end of the bar changes with [wHPBarType].
+
+	push hl
+	push de
+	push bc
+
+	; Left
+	ld a, $71 ; "HP:"
+	ld [hli], a
+	ld a, $62
+	ld [hli], a
+
+	push hl
+
+	; Middle
+	ld a, $63 ; empty
+.draw
+	ld [hli], a
+	dec d
+	jr nz, .draw
+
+	; Right
+	ld a, [wHPBarType]
+	dec a
+	ld a, $6d ; status screen and battle
+	jr z, .ok
+	dec a ; pokemon menu
+.ok
+	ld [hl], a
+
+	pop hl
+
+	ld a, e
+	and a
+	jr nz, .fill
+
+	; If c is nonzero, draw a pixel anyway.
+	ld a, c
+	and a
+	jr z, .done
+	ld e, 1
+
+.fill
+	ld a, e
+	sub 8
+	jr c, .partial
+	ld e, a
+	ld a, $6b ; full
+	ld [hli], a
+	ld a, e
+	and a
+	jr z, .done
+	jr .fill
+
+.partial
+	; Fill remaining pixels at the end if necessary.
+	ld a, $63 ; empty
+	add e
+	ld [hl], a
+.done
+	pop bc
+	pop de
+	pop hl
+	ret
+
+
+; loads pokemon data from one of multiple sources to wLoadedMon
+; loads base stats to wMonHeader
+; INPUT:
+; [wWhichPokemon] = index of pokemon within party/box
+; [wMonDataLocation] = source
+; 00: player's party
+; 01: enemy's party
+; 02: current box
+; 03: daycare
+; OUTPUT:
+; [wCurPartySpecies] = pokemon ID
+; wLoadedMon = base address of pokemon data
+; wMonHeader = base address of base stats
+LoadMonData::
+	jpfar LoadMonData_
+
+LoadFlippedFrontSpriteByMonIndex::
+	ld a, 1
+	ld [wSpriteFlipped], a
+
+LoadFrontSpriteByMonIndex::
+	push hl
+	ld a, [wPokedexNum]
+	ld c, a
+	ld a, [wPokedexNum + 1]
+	ld b, a
+	push bc
+	ld a, [wCurPartySpecies]
+	ld [wPokedexNum], a
+	ld a, [wCurPartySpecies + 1]
+	ld [wPokedexNum + 1], a
+	predef IndexToPokedex
+	ld hl, wPokedexNum
+	ld a, [hli]
+	ld e, a
+	ld a, [hl]
+	ld d, a
+	pop bc
+	ld [hl], b
+	dec hl
+	ld [hl], c
+	pop hl
+	ld a, e
+	and a
+	jr nz, .notZero
+	ld a, d
+	and a
+	jr z, .invalidDexNumber ; dex #0 invalid
+.notZero
+	ld a, d
+	cp HIGH(NUM_POKEMON + 1)
+	jr c, .validDexNumber
+	ld a, e
+	cp LOW(NUM_POKEMON + 1)
+	jr c, .validDexNumber   ; dex >#151 invalid
+.invalidDexNumber
+	; This is the so-called "Rhydon trap" or "Rhydon glitch"
+	; to fail-safe invalid dex numbers
+	; (see https://glitchcity.wiki/wiki/Rhydon_trap
+	; or https://bulbapedia.bulbagarden.net/wiki/Rhydon_glitch)
+	ld a, HIGH(RHYDON)
+	ld [wCurPartySpecies + 1], a
+	ld a, LOW(RHYDON)
+	ld [wCurPartySpecies], a
+	ret
+.validDexNumber
+	push hl
+	ld de, vFrontPic
+	call LoadMonFrontSprite
+	pop hl
+	ldh a, [hLoadedROMBank]
+	push af
+	ld a, BANK(CopyUncompressedPicToHL)
+	ldh [hLoadedROMBank], a
+	ld [rROMB], a
+	xor a
+	ldh [hStartTileID], a
+	call CopyUncompressedPicToHL
+	xor a
+	ld [wSpriteFlipped], a
+	pop af
+	ldh [hLoadedROMBank], a
+	ld [rROMB], a
+	ret
+
+
+PlayCry::
+; Play monster a's cry.
+	call GetCryData
+	call PlaySound
+	jp WaitForSoundToFinish
+
+GetCryData::
+; Load cry data for monster bc.
+	dec bc
+	ld hl, CryData
+	add hl, bc
+	add hl, bc
+	add hl, bc
+
+	ld a, BANK(CryData)
+	call BankswitchHome
+	ld a, [hli]
+	ld b, a ; cry id
+	ld a, [hli]
+	ld [wFrequencyModifier], a
+	ld a, [hl]
+	ld [wTempoModifier], a
+	call BankswitchBack
+
+	; Cry headers have 3 channels,
+	; and start from index CRY_SFX_START,
+	; so add 3 times the cry id.
+	ld a, b
+	ld c, CRY_SFX_START
+	rlca ; * 2
+	add b
+	add c
+	ret
+
+DisplayPartyMenu::
+	ldh a, [hTileAnimations]
+	push af
+	xor a
+	ldh [hTileAnimations], a
+	call GBPalWhiteOutWithDelay3
+	call ClearSprites
+	call PartyMenuInit
+	call DrawPartyMenu
+	jp HandlePartyMenuInput
+
+GoBackToPartyMenu::
+	ldh a, [hTileAnimations]
+	push af
+	xor a
+	ldh [hTileAnimations], a
+	call PartyMenuInit
+	call RedrawPartyMenu
+	jp HandlePartyMenuInput
+
+PartyMenuInit::
+	ld a, 1 ; hardcoded bank
+	call BankswitchHome
+	call LoadHpBarAndStatusTilePatterns
+	ld hl, wStatusFlags5
+	set BIT_NO_TEXT_DELAY, [hl]
+	xor a ; PLAYER_PARTY_DATA
+	ld [wMonDataLocation], a
+	ld [wMenuWatchMovingOutOfBounds], a
+	ld hl, wTopMenuItemY
+	inc a
+	ld [hli], a ; top menu item Y
+	xor a
+	ld [hli], a ; top menu item X
+	ld a, [wPartyAndBillsPCSavedMenuItem]
+	push af
+	ld [hli], a ; current menu item ID
+	inc hl
+	ld a, [wPartyCount]
+	and a ; are there more than 0 pokemon in the party?
+	jr z, .storeMaxMenuItemID
+	dec a
+; if party is not empty, the max menu item ID is ([wPartyCount] - 1)
+; otherwise, it is 0
+.storeMaxMenuItemID
+	ld [hli], a ; max menu item ID
+	ld a, [wForcePlayerToChooseMon]
+	and a
+	ld a, PAD_A | PAD_B
+	jr z, .next
+	xor a
+	ld [wForcePlayerToChooseMon], a
+	inc a ; a = PAD_A
+.next
+	ld [hli], a ; menu watched keys
+	pop af
+	ld [hl], a ; old menu item ID
+	ret
+
+HandlePartyMenuInput::
+	ld a, 1
+	ld [wMenuWrappingEnabled], a
+	ld a, $40
+	ld [wPartyMenuAnimMonEnabled], a
+	call HandleMenuInput_
+	call PlaceUnfilledArrowMenuCursor
+	ld b, a
+	xor a
+	ld [wPartyMenuAnimMonEnabled], a
+	ld a, [wCurrentMenuItem]
+	ld [wPartyAndBillsPCSavedMenuItem], a
+	ld hl, wStatusFlags5
+	res BIT_NO_TEXT_DELAY, [hl]
+	ld a, [wMenuItemToSwap]
+	and a
+	jp nz, .swappingPokemon
+	pop af
+	ldh [hTileAnimations], a
+	bit B_PAD_B, b
+	jr nz, .noPokemonChosen
+	ld a, [wPartyCount]
+	and a
+	jr z, .noPokemonChosen
+	ld a, [wCurrentMenuItem]
+	ld [wWhichPokemon], a
+	ld hl, wPartySpecies
+	ld b, 0
+	ld c, a
+	add hl, bc
+	add hl, bc
+	ld a, [hli]
+	ld [wCurPartySpecies], a
+	ld [wBattleMonSpecies2], a
+	ld a, [hl]
+	ld [wCurPartySpecies + 1], a
+	ld [wBattleMonSpecies2 + 1], a
+	call BankswitchBack
+	and a
+	ret
+.noPokemonChosen
+	call BankswitchBack
+	scf
+	ret
+.swappingPokemon
+	bit B_PAD_B, b
+	jr z, .handleSwap ; if not, handle swapping the pokemon
+.cancelSwap ; if the B button was pressed
+	farcall ErasePartyMenuCursors
+	xor a
+	ld [wMenuItemToSwap], a
+	ld [wPartyMenuTypeOrMessageID], a
+	call RedrawPartyMenu
+	jr HandlePartyMenuInput
+.handleSwap
+	ld a, [wCurrentMenuItem]
+	ld [wWhichPokemon], a
+	farcall SwitchPartyMon
+	jp HandlePartyMenuInput
+
+DrawPartyMenu::
+	ld hl, DrawPartyMenu_
+	jr DrawPartyMenuCommon
+
+RedrawPartyMenu::
+	ld hl, RedrawPartyMenu_
+
+DrawPartyMenuCommon::
+	ld b, BANK(RedrawPartyMenu_)
+	jp Bankswitch
+
+; prints a pokemon's status condition
+; INPUT:
+; de = address of status condition
+; hl = destination address
+PrintStatusCondition::
+	push de
+	dec de
+	dec de ; de = address of current HP
+	ld a, [de]
+	ld b, a
+	dec de
+	ld a, [de]
+	or b ; is the pokemon's HP zero?
+	pop de
+	jr nz, PrintStatusConditionNotFainted
+; if the pokemon's HP is 0, print "FNT"
+	ld a, "F"
+	ld [hli], a
+	ld a, "N"
+	ld [hli], a
+	ld [hl], "T"
+	and a
+	ret
+
+PrintStatusConditionNotFainted::
+	homecall_sf PrintStatusAilment
+	ret
+
+; function to print pokemon level, leaving off the ":L" if the level is at least 100
+; INPUT:
+; hl = destination address
+; [wLoadedMonLevel] = level
+PrintLevel::
+	ld a, "<LV>" ; ":L" tile ID
+	ld [hli], a
+	ld c, 2 ; number of digits
+	ld a, [wLoadedMonLevel] ; level
+	cp 100
+	jr c, PrintLevelCommon
+; if level at least 100, write over the ":L" tile
+	dec hl
+	inc c ; increment number of digits to 3
+	jr PrintLevelCommon
+
+; prints the level without leaving off ":L" regardless of level
+; INPUT:
+; hl = destination address
+; [wLoadedMonLevel] = level
+PrintLevelFull::
+	ld a, "<LV>" ; ":L" tile ID
+	ld [hli], a
+	ld c, 3 ; number of digits
+	ld a, [wLoadedMonLevel] ; level
+
+PrintLevelCommon::
+	ld [wTempByteValue], a
+	ld de, wTempByteValue
+	ld b, LEFT_ALIGN | 1 ; 1 byte
+	jp PrintNumber
+
+; copies the base stat data of a pokemon to wMonHeader
+; INPUT:
+; [wCurSpecies] and [wCurSpecies+1] = pokemon ID
+GetMonHeader::
+	ldh a, [hLoadedROMBank]
+	push af
+	ld a, BANK(BaseStatsPointers)
+	ldh [hLoadedROMBank], a
+	ld [rROMB], a
+	push bc
+	push de
+	push hl
+	ld a, [wPokedexNum]
+	ld c, a
+	ld a, [wPokedexNum + 1]
+	ld b, a
+	push bc
+	ld a, [wCurSpecies]
+	ld [wPokedexNum], a
+	ld a, [wCurSpecies + 1]
+	ld [wPokedexNum + 1], a
+	ld de, FOSSIL_KABUTOPS
+	call CompareWithCurSpecies
+	ld de, FossilKabutopsPic
+	lb bc, $66, BANK(FossilKabutopsPic)
+	jr z, .specialID
+	ld de, MON_GHOST
+	call CompareWithCurSpecies
+	ld de, GhostPic
+	lb bc, $66, BANK(GhostPic)
+	jr z, .specialID
+	ld de, FOSSIL_AERODACTYL
+	call CompareWithCurSpecies
+	ld de, FossilAerodactylPic
+	lb bc, $77, BANK(FossilAerodactylPic)
+	jr z, .specialID
+	predef IndexToPokedex
+	ld a, [wPokedexNum]
+	ld e, a
+	ld a, [wPokedexNum + 1]
+	ld d, a
+	dec de
+	ld hl, BaseStatsPointers
+	add hl, de
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld b, a
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wMonHeader
+	ld a, b
+	ld bc, BASE_DATA_SIZE
+	call FarCopyData
+	jr .done
+.specialID
+	ld hl, wMonHSpriteDim
+	ld [hl], b ; write sprite dimensions
+	inc hl
+	ld [hl], e ; write front sprite pointer
+	inc hl
+	ld [hl], d
+	ld hl, wMonHSpritesBank
+	ld [hl], c
+.done
+	ld a, [wCurSpecies]
+	ld [wMonHIndex], a
+	ld a, [wCurSpecies + 1]
+	ld [wMonHIndex + 1], a
+	pop bc
+	ld a, c
+	ld [wPokedexNum], a
+	ld a, b
+	ld [wPokedexNum + 1], a
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ldh [hLoadedROMBank], a
+	ld [rROMB], a
+	ret
+
+; copy party pokemon's name to wNameBuffer
+GetPartyMonName2::
+	ld a, [wWhichPokemon] ; index within party
+	ld hl, wPartyMonNicks
+
+; this is called more often
+GetPartyMonName::
+	push hl
+	push bc
+	call SkipFixedLengthTextEntries ; add NAME_LENGTH to hl, a times
+	ld de, wNameBuffer
+	push de
+	ld bc, NAME_LENGTH
+	call CopyData
+	pop de
+	pop bc
+	pop hl
+	ret
+
+CompareWithCurSpecies::
+	ld a, [wCurSpecies]
+	ld c, a
+	ld a, [wCurSpecies + 1]
+	ld b, a
+	; fallthrough
+
+CompareTwoBytes::
+	ld a, b
+	cp d
+	ret nz
+	ld a, c
+	cp e
+	ret

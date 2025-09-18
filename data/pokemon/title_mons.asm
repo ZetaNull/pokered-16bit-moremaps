@@ -1,0 +1,38 @@
+TitleMons:
+; mons on the title screen are randomly chosen from here
+IF DEF(_RED)
+	dw STARTER1
+	dw STARTER2
+	dw STARTER3
+	dw WEEDLE
+	dw NIDORAN_M
+	dw SCYTHER
+	dw PIKACHU
+	dw CLEFAIRY
+	dw RHYDON
+	dw ABRA
+	dw GASTLY
+	dw DITTO
+	dw PIDGEOTTO
+	dw ONIX
+	dw PONYTA
+	dw MAGIKARP
+ENDC
+IF DEF(_BLUE)
+	dw STARTER2
+	dw STARTER1
+	dw STARTER3
+	dw MANKEY
+	dw HITMONLEE
+	dw VULPIX
+	dw CHANSEY
+	dw AERODACTYL
+	dw JOLTEON
+	dw SNORLAX
+	dw GLOOM
+	dw POLIWAG
+	dw DODUO
+	dw PORYGON
+	dw GENGAR
+	dw RAICHU
+ENDC
