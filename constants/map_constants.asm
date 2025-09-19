@@ -272,3 +272,13 @@ DEF NUM_MAPS EQU const_value
 ; Indoor maps, such as houses, use this as the Map ID in their exit warps
 ; This map ID takes the player back to the last outdoor map they were on, stored in wLastMap
 DEF LAST_MAP EQU -1
+
+; Secondary mapset map IDs
+	const_def
+	map_const UNUSED_MAP_SET2CITY,            0,  0 ; $00
+DEF NUM_CITY_MAPS_2 EQU const_value
+DEF FIRST_ROUTE_MAP_2 EQU const_value
+	map_const UNUSED_MAP_SET2ROUTE,           0,  0 ; $01
+DEF FIRST_INDOOR_MAP_2 EQU const_value
+	map_const TEST_HELL,                     10, 10 ; $02
+DEF NUM_MAPS_2 EQU const_value

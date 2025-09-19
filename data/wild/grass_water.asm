@@ -251,6 +251,14 @@ WildDataPointers:
 	assert_table_length NUM_MAPS
 	dw -1 ; end
 
+WildDataPointers2:
+	table_width 2
+	dw NothingWildMons         ; Unused
+	dw NothingWildMons         ; Unused
+	dw NothingWildMons         ; Test Hell
+	assert_table_length NUM_MAPS_2
+	dw -1 ; end
+
 ; wild pokemon data is divided into two parts.
 ; first part:  pokemon found in grass
 ; second part: pokemon found while surfing

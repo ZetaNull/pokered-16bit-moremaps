@@ -254,6 +254,15 @@ MapHSPointers:
 	assert_table_length NUM_MAPS
 	dw -1 ; end
 
+MapHSPointers2:
+; entries correspond to map ids
+	table_width 2
+	dw NoHS
+	dw NoHS
+	dw NoHS
+	assert_table_length NUM_MAPS_2
+	dw -1 ; end
+
 NoHS:
 	db -1, -1, -1 ; end
 

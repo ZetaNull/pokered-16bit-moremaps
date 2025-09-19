@@ -249,3 +249,10 @@ MapSongBanks::
 	db MUSIC_DUNGEON1, BANK(Music_Dungeon1) ; BRUNOS_ROOM
 	db MUSIC_POKEMON_TOWER, BANK(Music_PokemonTower) ; AGATHAS_ROOM
 	assert_table_length NUM_MAPS
+
+MapSongBanks2::
+	table_width 2
+	db MUSIC_SILPH_CO, BANK(Music_SilphCo) ; Unused
+	db MUSIC_SILPH_CO, BANK(Music_SilphCo) ; Unused
+	db MUSIC_SILPH_CO, BANK(Music_SilphCo) ; Test Hell
+	assert_table_length NUM_MAPS_2

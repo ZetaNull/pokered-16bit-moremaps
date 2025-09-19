@@ -250,3 +250,10 @@ MapHeaderPointers::
 	dw BrunosRoom_h
 	dw AgathasRoom_h
 	assert_table_length NUM_MAPS
+
+MapHeaderPointers2::
+	table_width 2
+	dw SilphCo2F_h ; UNUSED_MAP_1
+	dw SilphCo2F_h ; UNUSED_MAP_2
+	dw TestHell_h
+	assert_table_length NUM_MAPS_2

@@ -250,3 +250,10 @@ MapHeaderBanks::
 	db BANK(BrunosRoom_h)
 	db BANK(AgathasRoom_h)
 	assert_table_length NUM_MAPS
+
+MapHeaderBanks2::
+	table_width 1
+	db $11 ; UNUSED_01
+	db $11 ; UNUSED_02
+	db BANK(TestHell_h)
+	assert_table_length NUM_MAPS_2
