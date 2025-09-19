@@ -254,7 +254,7 @@ WildDataPointers:
 WildDataPointers2:
 	table_width 2
 	dw NothingWildMons         ; Unused
-	dw NothingWildMons         ; Unused
+	dw Route1WildMons          ; False Route
 	dw NothingWildMons         ; Test Hell
 	assert_table_length NUM_MAPS_2
 	dw -1 ; end

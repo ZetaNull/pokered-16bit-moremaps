@@ -278,7 +278,7 @@ DEF LAST_MAP EQU -1
 	map_const UNUSED_MAP_SET2CITY,            0,  0 ; $00
 DEF NUM_CITY_MAPS_2 EQU const_value
 DEF FIRST_ROUTE_MAP_2 EQU const_value
-	map_const UNUSED_MAP_SET2ROUTE,           0,  0 ; $01
+	map_const FALSE_ROUTE,                   20,  9 ; $01
 DEF FIRST_INDOOR_MAP_2 EQU const_value
 	map_const TEST_HELL,                     10, 10 ; $02
 DEF NUM_MAPS_2 EQU const_value

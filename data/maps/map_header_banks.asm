@@ -254,6 +254,6 @@ MapHeaderBanks::
 MapHeaderBanks2::
 	table_width 1
 	db $11 ; UNUSED_01
-	db $11 ; UNUSED_02
+	db BANK(FalseRoute_h)
 	db BANK(TestHell_h)
 	assert_table_length NUM_MAPS_2

@@ -1224,3 +1224,8 @@ INCLUDE "data/maps/headers/TestHell.asm"
 INCLUDE "scripts/TestHell.asm"
 INCLUDE "data/maps/objects/TestHell.asm"
 TestHell_Blocks: INCBIN "maps/TestHell.blk"
+
+INCLUDE "data/maps/headers/FalseRoute.asm"
+INCLUDE "scripts/FalseRoute.asm"
+INCLUDE "data/maps/objects/FalseRoute.asm"
+FalseRoute_Blocks: INCBIN "maps/FalseRoute.blk"

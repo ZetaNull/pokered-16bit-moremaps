@@ -254,6 +254,6 @@ MapHeaderPointers::
 MapHeaderPointers2::
 	table_width 2
 	dw SilphCo2F_h ; UNUSED_MAP_1
-	dw SilphCo2F_h ; UNUSED_MAP_2
+	dw FalseRoute_h
 	dw TestHell_h
 	assert_table_length NUM_MAPS_2

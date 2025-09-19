@@ -1,5 +1,12 @@
 LoadWildData::
 	ld hl, WildDataPointers
+	;Begin Zetacode
+	ld a, [wCurMapset]
+	cp a, 0
+	jr z, .cont1
+	ld hl, WildDataPointers2
+.cont1
+	;End Zetacode
 	ld a, [wCurMap]
 
 	; get wild data for current map
