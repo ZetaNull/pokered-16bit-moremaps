@@ -2047,6 +2047,13 @@ LoadMapHeader::
 	bit BIT_NO_PREVIOUS_MAP, b
 	ret nz
 	ld hl, MapHeaderPointers
+	;Begin Zetacode
+	ld a, [wCurMapset]
+	cp a, 0
+	jr z, .cont2
+	ld hl, MapHeaderPointers2
+.cont2
+	;End Zetacode
 	ld a, [wCurMap]
 	sla a
 	jr nc, .noCarry1
@@ -2403,6 +2410,11 @@ SwitchToMapRomBank::
 	ld a, BANK(MapHeaderBanks)
 	call BankswitchHome
 	ld hl, MapHeaderBanks
+	ld a, [wCurMapset]
+	cp a, 0
+	jr z, .cont2
+	ld hl, MapHeaderBanks2
+.cont2
 	add hl, bc
 	ld a, [hl]
 	ldh [hMapROMBank], a
