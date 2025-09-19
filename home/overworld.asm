@@ -2050,9 +2050,9 @@ LoadMapHeader::
 	;Begin Zetacode
 	ld a, [wCurMapset]
 	cp a, 0
-	jr z, .cont2
+	jr z, .cont1
 	ld hl, MapHeaderPointers2
-.cont2
+.cont1
 	;End Zetacode
 	ld a, [wCurMap]
 	sla a
@@ -2312,10 +2312,27 @@ LoadMapHeader::
 	ld b, $00
 	ldh a, [hLoadedROMBank]
 	push af
+; This commented out bit is unneeded unless you move mapsongbanks and mapsongbanks2 into separate banks. Whoops.
+;	;Begin Zetacode
+;	ld a, [wCurMapset]
+;	cp a, 0
+;	jr z, .cont2
+;	ld a, BANK(MapSongBanks2)
+;	jr .cont3
+;.cont2
 	ld a, BANK(MapSongBanks)
+;.cont3
+;	;End Zetacode
 	ldh [hLoadedROMBank], a
 	ld [rROMB], a
 	ld hl, MapSongBanks
+	;Begin Zetacode
+	ld a, [wCurMapset]
+	cp a, 0
+	jr z, .cont4
+	ld hl, MapSongBanks2
+.cont4
+	;End Zetacode
 	add hl, bc
 	add hl, bc
 	ld a, [hli]
