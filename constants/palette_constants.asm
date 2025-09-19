@@ -59,4 +59,6 @@ DEF SET_PAL_DEFAULT EQU $ff
 	const PAL_BADGE     ; $22
 	const PAL_CAVE      ; $23
 	const PAL_GAMEFREAK ; $24
+DEF MAPSET_2_CITYPALS EQU const_value
+	const PAL_HELLCITY	; $25
 DEF NUM_SGB_PALS EQU const_value

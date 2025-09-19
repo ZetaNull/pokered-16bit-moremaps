@@ -1229,3 +1229,8 @@ INCLUDE "data/maps/headers/FalseRoute.asm"
 INCLUDE "scripts/FalseRoute.asm"
 INCLUDE "data/maps/objects/FalseRoute.asm"
 FalseRoute_Blocks: INCBIN "maps/FalseRoute.blk"
+
+INCLUDE "data/maps/headers/HellCity.asm"
+INCLUDE "scripts/HellCity.asm"
+INCLUDE "data/maps/objects/HellCity.asm"
+HellCity_Blocks: INCBIN "maps/HellCity.blk"

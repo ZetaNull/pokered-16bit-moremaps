@@ -1,5 +1,5 @@
 FalseRoute_Object:
-	db $2e ; border block
+	db $0f ; border block
 
 	def_warp_events
 	warp_event 14,  5, TEST_HELL, 66

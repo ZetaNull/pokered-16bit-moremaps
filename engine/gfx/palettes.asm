@@ -145,14 +145,16 @@ SetPal_Overworld:
 	ld de, wPalPacket
 	ld bc, $10
 	call CopyData
-	ld a, [wCurMapset]
-	cp a, 0
-	jr nz, .caveOrBruno
 	ld a, [wCurMapTileset]
 	cp CEMETERY
 	jr z, .PokemonTowerOrAgatha
 	cp CAVERN
 	jr z, .caveOrBruno
+	;Begin Zetacode
+	ld a, [wCurMapset]
+	cp a, 0
+	jr nz, .mapset2
+	;End Zetacode
 	ld a, [wCurMap]
 	cp FIRST_INDOOR_MAP
 	jr c, .townOrRoute
@@ -187,6 +189,27 @@ SetPal_Overworld:
 .Lorelei
 	xor a
 	jr .town
+;Begin Zetacode
+.mapset2
+	ld a, [wCurMap]
+	cp FIRST_INDOOR_MAP_2
+	jr c, .townOrRoute2
+.normalDungeonOrBuilding2
+	ld a, [wLastMap] ; town or route that current dungeon or building is located
+.townOrRoute2
+	cp NUM_CITY_MAPS_2
+	jr c, .town2
+	ld a, PAL_ROUTE - 1
+	jp .town
+.town2
+	add a, MAPSET_2_CITYPALS ; Should add the beginning of mapset 2's palettes to lastmap to get proper index
+	ld hl, wPalPacket + 1
+	ld [hld], a
+	ld de, BlkPacket_WholeScreen
+	ld a, SET_PAL_OVERWORLD
+	ld [wDefaultPaletteCommand], a
+	ret
+
 
 ; used when a Pokemon is the only thing on the screen
 ; such as evolution, trading and the Hall of Fame

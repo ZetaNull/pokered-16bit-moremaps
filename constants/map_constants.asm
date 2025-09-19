@@ -275,7 +275,7 @@ DEF LAST_MAP EQU -1
 
 ; Secondary mapset map IDs
 	const_def
-	map_const UNUSED_MAP_SET2CITY,            0,  0 ; $00
+	map_const HELL_CITY,                     10, 10 ; $00
 DEF NUM_CITY_MAPS_2 EQU const_value
 DEF FIRST_ROUTE_MAP_2 EQU const_value
 	map_const FALSE_ROUTE,                   20,  9 ; $01

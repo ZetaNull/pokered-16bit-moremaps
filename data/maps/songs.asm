@@ -252,7 +252,7 @@ MapSongBanks::
 
 MapSongBanks2::
 	table_width 2
-	db MUSIC_SILPH_CO, BANK(Music_SilphCo) ; Unused
-	db MUSIC_SILPH_CO, BANK(Music_SilphCo) ; Unused
+	db MUSIC_CITIES1, BANK(Music_Cities1) ; Hell City
+	db MUSIC_DUNGEON1, BANK(Music_Dungeon1) ; False Route
 	db MUSIC_SILPH_CO, BANK(Music_SilphCo) ; Test Hell
 	assert_table_length NUM_MAPS_2
