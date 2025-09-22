@@ -2916,9 +2916,17 @@ ReadSuperRodData:
 ; return c = 2 if no fish on this map
 ; return c = 1 if a bite, b = level, de = species
 ; return c = 0 if no bite
-	ld a, [wCurMap]
+	;ld a, [wCurMap]   ; moved to after loading HL so the mapset test can be done with a first
 	ld de, 3 ; each fishing group is three bytes wide
 	ld hl, SuperRodData
+	;Begin Zetacode
+	ld a, [wCurMapset]
+	cp a, 0
+	jr z, .cont1
+	ld hl, SuperRodData2
+.cont1
+	ld a, [wCurMap]
+	;End Zetacode
 	call IsInArray
 	jr c, .ReadFishingGroup
 	ld c, $2 ; $2 if no fishing groups found

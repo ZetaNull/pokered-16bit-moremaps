@@ -99,3 +99,18 @@ SuperRodData:
 	dbw 15, KRABBY
 	dbw 15, GOLDEEN
 	dbw 15, MAGIKARP
+
+SuperRodData2:
+	; map, fishing group
+	; dbw all that like the other one, seems to require different groups, though. 
+	; (you could probably make it work by making the fishing groups not relative or whatever the hell but i can't be bothered)
+	dbw FALSE_ROUTE,         .Group1
+	db -1 ; end
+	
+; fishing groups
+; number of monsters, followed by level/monster pairs
+
+.Group1:
+	db 2
+	dbw 15, DRAGONITE
+	dbw 95, DRAGONITE

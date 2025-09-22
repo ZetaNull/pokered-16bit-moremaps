@@ -9,6 +9,13 @@ MarkTownVisitedAndLoadMissableObjects::
 	predef FlagActionPredef
 .notInTown
 	ld hl, MapHSPointers
+	;Begin Zetacode
+	ld a, [wCurMapset]
+	cp a, 0
+	jr z, .cont1
+	ld hl, MapHSPointers2
+.cont1
+	;End Zetacode
 	ld a, [wCurMap]
 	ld b, $0
 	ld c, a
