@@ -1,3 +1,6 @@
+	object_const_def
+	const_export TESTHELL_BALL
+
 TestHell_Object:
 	db $2e ; border block
 
@@ -9,5 +12,6 @@ TestHell_Object:
 	def_bg_events
 
 	def_object_events
+	object_event  11,  2, SPRITE_POKE_BALL, STAY, NONE, TEXT_TESTHELL_BALL
 
 	def_warps_to TEST_HELL

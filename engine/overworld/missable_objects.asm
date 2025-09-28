@@ -1,4 +1,11 @@
 MarkTownVisitedAndLoadMissableObjects::
+; ZetaReminders - UNFINISHED!! COME BACK LATER TO DO THIS PROPERLY.
+; Currently skipping marking towns as visited in the second mapset.
+	;Begin Zetacode
+	ld a, [wCurMapset]
+	cp a, 0
+	jr nz, .notInTown
+	; End Zetacode
 	ld a, [wCurMap]
 	cp FIRST_ROUTE_MAP
 	jr nc, .notInTown
